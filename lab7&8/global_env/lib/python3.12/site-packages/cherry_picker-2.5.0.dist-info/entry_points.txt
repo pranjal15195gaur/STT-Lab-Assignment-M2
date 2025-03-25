@@ -1,0 +1,2 @@
+[console_scripts]
+cherry_picker = cherry_picker.cherry_picker:cherry_pick_cli

@@ -1,0 +1,129 @@
+Metadata-Version: 2.3
+Name: stamina
+Version: 24.3.0
+Summary: Production-grade retries made easy.
+Project-URL: Documentation, https://stamina.hynek.me/
+Project-URL: Source, https://github.com/hynek/stamina
+Project-URL: Changelog, https://github.com/hynek/stamina/blob/main/CHANGELOG.md
+Project-URL: Funding, https://github.com/sponsors/hynek
+Project-URL: Mastodon, https://mastodon.social/@hynek
+Project-URL: Twitter, https://twitter.com/hynek
+Author-email: Hynek Schlawack <hs@ox.cx>
+License-Expression: MIT
+License-File: LICENSE
+Keywords: reliability,retries,retry
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Framework :: AsyncIO
+Classifier: Framework :: Trio
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Typing :: Typed
+Requires-Python: >=3.8
+Requires-Dist: tenacity
+Requires-Dist: typing-extensions; python_version < '3.10'
+Provides-Extra: dev
+Requires-Dist: anyio; extra == 'dev'
+Requires-Dist: mypy>=1.4; extra == 'dev'
+Requires-Dist: nox>=2024.3.2; extra == 'dev'
+Requires-Dist: prometheus-client; extra == 'dev'
+Requires-Dist: pytest; extra == 'dev'
+Requires-Dist: structlog; extra == 'dev'
+Requires-Dist: tomli; (python_version < '3.11') and extra == 'dev'
+Requires-Dist: trio; extra == 'dev'
+Requires-Dist: uv; extra == 'dev'
+Provides-Extra: docs
+Requires-Dist: furo; extra == 'docs'
+Requires-Dist: myst-parser; extra == 'docs'
+Requires-Dist: prometheus-client; extra == 'docs'
+Requires-Dist: sphinx-copybutton; extra == 'docs'
+Requires-Dist: sphinx-notfound-page; extra == 'docs'
+Requires-Dist: sphinx>=7.2.2; extra == 'docs'
+Requires-Dist: structlog; extra == 'docs'
+Provides-Extra: tests
+Requires-Dist: anyio; extra == 'tests'
+Requires-Dist: pytest; extra == 'tests'
+Provides-Extra: typing
+Requires-Dist: mypy>=1.4; extra == 'typing'
+Description-Content-Type: text/markdown
+
+# *stamina*: Production-grade Retries Made Easy
+
+Transient failures are common in distributed systems.
+To make your systems resilient, you need to **retry** failed operations.
+But bad retries can make things *much worse*.
+
+*stamina* is an opinionated wrapper around the great-but-unopinionated [Tenacity](https://tenacity.readthedocs.io/) package.
+Our goal is to be as **ergonomic** as possible, while doing the **right thing by default**, and minimizing the potential for **misuse**.
+It is the result of years of copy-pasting the same configuration over and over again:
+
+- Retry only on certain exceptions – or even a subset of them by introspecting them first using a predicate.
+- Exponential **backoff** with **jitter** between retries.
+- Limit the number of retries **and** total time.
+- Automatic **async** support – including [Trio](https://trio.readthedocs.io/).
+- Preserve **type hints** of the decorated callable.
+- Flexible **instrumentation** with [Prometheus](https://github.com/prometheus/client_python), [*structlog*](https://www.structlog.org/), and standard library's `logging` support out-of-the-box.
+- Dedicated support for **testing** that allows to _globally_ deactivate retries, or to limit the number of retries and to remove backoffs.
+
+For example:
+
+```python
+import httpx
+
+import stamina
+
+
+@stamina.retry(on=httpx.HTTPError, attempts=3)
+def do_it(code: int) -> httpx.Response:
+    resp = httpx.get(f"https://httpbin.org/status/{code}")
+    resp.raise_for_status()
+
+    return resp
+```
+
+<!-- end docs index -->
+
+**Async** callables work use the same API and it's possible to retry **arbitrary blocks**, too.
+Check out our [tutorial](https://stamina.hynek.me/en/latest/tutorial.html) for more examples!
+
+
+
+## Release Information
+
+### Added
+
+- The *on* argument in all retry functions now can be a callable that takes an exception and returns a bool which decides whether or not a retry should be scheduled.
+  [#70](https://github.com/hynek/stamina/pull/70)
+
+- `stamina.Attempt` now has a `next_wait` attribute that contains the time the *next* backoff will wait, if the *current* attempt fails (sans jitter).
+  [#72](https://github.com/hynek/stamina/pull/72)
+
+- It is now possible to switch *stamina* into a testing mode using `stamina.set_testing()`.
+  It disables backoffs and caps the number of retries.
+  [#73](https://github.com/hynek/stamina/pull/73)
+
+
+---
+
+[Full Changelog →](https://github.com/hynek/stamina/blob/main/CHANGELOG.md)
+
+
+## Credits
+
+*stamina* is written by [Hynek Schlawack](https://hynek.me/) and distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.
+
+The development is kindly supported by my employer [Variomedia AG](https://www.variomedia.de/) and all my amazing [GitHub Sponsors](https://github.com/sponsors/hynek).
+
+This project would not be possible without the years of incredible work that went into [Tenacity](https://tenacity.readthedocs.io/).
+
+
+## *stamina* for Enterprise
+
+Available as part of the [Tidelift Subscription](https://tidelift.com/?utm_source=lifter&utm_medium=referral&utm_campaign=hynek).
+
+The maintainers of *stamina* and thousands of other packages are working with Tidelift to deliver commercial support and maintenance for the open-source packages you use to build your applications.
+Save time, reduce risk, and improve code health, while paying the maintainers of the exact packages you use.

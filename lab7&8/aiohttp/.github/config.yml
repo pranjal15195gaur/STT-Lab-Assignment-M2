@@ -1,0 +1,7 @@
+chronographer:
+  exclude:
+    bots:
+    - dependabot-preview
+    - dependabot
+    humans:
+    - pyup-bot

@@ -1,0 +1,21 @@
+Metadata-Version: 2.1
+Name: aiohttp-theme
+Version: 0.1.7
+Summary: A configurable sidebar-enabled Sphinx theme
+Home-page: https://github.com/aio-libs/aiohttp-theme
+Author: Andrew Svetlov
+Author-email: andrew.svetlov@gmail.com
+License: BSD License
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Topic :: Documentation
+Classifier: Topic :: Software Development :: Documentation
+
+aiohttp documentation theme
+===========================
+
+Based on Alabaster http://alabaster.readthedocs.io
